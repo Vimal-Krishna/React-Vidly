@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 const NavBar = (props) => {
     return (
-        <nav className="navbar navbar-expand-sm navbar-light bg-light">
+        <nav className="navbar navbar-expand navbar-light bg-light">
             <NavLink className="navbar-brand" to="/">
                 Vidly
             </NavLink>
