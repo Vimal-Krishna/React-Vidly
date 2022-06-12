@@ -1,12 +1,13 @@
 import React, { Component } from "react";
-import { getMovies } from "../services/fakeMovieService";
+import { deleteMovie, getMovies } from "../services/fakeMovieService";
+import { getGenres } from "../services/fakeGenreService";
 import Pagination from "./common/pagination";
 import { paginate } from "../utils/paginate";
 import Genres from "./genres";
-import { getGenres } from "../services/fakeGenreService";
+
 import MoviesTable from "./moviesTable";
 import _ from "lodash";
-import NavBar from "./navbar";
+import Link from "react-router-dom/Link";
 
 class Movies extends Component {
     state = {
@@ -23,6 +24,11 @@ class Movies extends Component {
         this.setState({ movies: getMovies(), genres });
     }
 
+    handleNewMovie = () => {
+        console.log("New movie");
+        this.props.history.push("/movies/new");
+    };
+
     handleLike = (movie) => {
         const movies = [...this.state.movies];
         const index = this.state.movies.indexOf(movie);
@@ -38,6 +44,7 @@ class Movies extends Component {
         this.setState({
             movies: updatedMovies,
         });
+        deleteMovie(movieId);
     };
 
     handlePageChange = (page) => {
@@ -75,7 +82,6 @@ class Movies extends Component {
     };
 
     render() {
-        console.log(this.props.match.params);
         const { length: count } = this.state.movies;
         const { sortColumn } = this.state;
         if (count === 0) return <p>There are no movies in the database.</p>;
@@ -98,6 +104,13 @@ class Movies extends Component {
                     />
                 </div>
                 <div className="col-9">
+                    <Link
+                        to="/movies/new"
+                        className="btn btn-primary"
+                        style={{ marginBottom: 20 }}
+                    >
+                        New Movie
+                    </Link>
                     <h6>{movieString}</h6>
                     <MoviesTable
                         data={movies}
