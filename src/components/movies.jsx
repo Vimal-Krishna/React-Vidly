@@ -16,6 +16,7 @@ class Movies extends Component {
         pageSize: 4,
         currentPage: 1,
         selectedGenre: 0,
+        searchString: "",
         sortColumn: { path: "title", order: "asc" },
     };
 
@@ -23,6 +24,14 @@ class Movies extends Component {
         const genres = [{ name: "All Genres", _id: 0 }, ...getGenres()];
         this.setState({ movies: getMovies(), genres });
     }
+
+    handleSearch = ({ currentTarget: input }) => {
+        this.setState({
+            searchString: input.value,
+            selectedGenre: 0,
+            currentPage: 1,
+        });
+    };
 
     handleNewMovie = () => {
         console.log("New movie");
@@ -53,7 +62,11 @@ class Movies extends Component {
 
     handleGenreSelect = (genre) => {
         console.log("Genre Clicked", genre);
-        this.setState({ selectedGenre: genre._id, currentPage: 1 });
+        this.setState({
+            selectedGenre: genre._id,
+            searchString: "",
+            currentPage: 1,
+        });
     };
 
     handleSort = (sortColumn) => {
@@ -66,11 +79,18 @@ class Movies extends Component {
             selectedGenre,
             sortColumn,
             currentPage,
+            searchString,
             pageSize,
         } = this.state;
 
         let filtered = allMovies;
-        if (selectedGenre !== 0) {
+
+        if (searchString) {
+            console.log(searchString);
+            filtered = filtered.filter((m) =>
+                m.title.toLowerCase().startsWith(searchString.toLowerCase())
+            );
+        } else if (selectedGenre !== 0) {
             filtered = filtered.filter(
                 (movie) => movie.genre._id === selectedGenre
             );
@@ -112,6 +132,12 @@ class Movies extends Component {
                         New Movie
                     </Link>
                     <h6>{movieString}</h6>
+                    <input
+                        className="form-control my-3"
+                        placeholder="Search..."
+                        value={this.state.searchString}
+                        onChange={this.handleSearch}
+                    />
                     <MoviesTable
                         data={movies}
                         sortColumn={sortColumn}
