@@ -5,6 +5,7 @@ import Pagination from "./common/pagination";
 import { paginate } from "../utils/paginate";
 import Genres from "./genres";
 
+import SearchBox from "./searchbox";
 import MoviesTable from "./moviesTable";
 import _ from "lodash";
 import Link from "react-router-dom/Link";
@@ -132,10 +133,8 @@ class Movies extends Component {
                         New Movie
                     </Link>
                     <h6>{movieString}</h6>
-                    <input
-                        className="form-control my-3"
-                        placeholder="Search..."
-                        value={this.state.searchString}
+                    <SearchBox
+                        searchString={this.state.searchString}
                         onChange={this.handleSearch}
                     />
                     <MoviesTable
