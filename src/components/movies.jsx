@@ -1,10 +1,13 @@
 import React, { Component } from "react";
-import { deleteMovie, getMovies } from "../services/fakeMovieService";
-import { getGenres } from "../services/fakeGenreService";
+import { toast } from "react-toastify";
+//import { deleteMovie, getMovies } from "../services/fakeMovieService";
+//import { getGenres } from "../services/fakeGenreService";
+import { deleteMovie, getMovies } from "../services/movieService";
+import { getGenres } from "../services/genreService";
 import Pagination from "./common/pagination";
 import { paginate } from "../utils/paginate";
-import Genres from "./genres";
 
+import Genres from "./genres";
 import SearchBox from "./searchbox";
 import MoviesTable from "./moviesTable";
 import _ from "lodash";
@@ -21,9 +24,11 @@ class Movies extends Component {
         sortColumn: { path: "title", order: "asc" },
     };
 
-    componentDidMount() {
-        const genres = [{ name: "All Genres", _id: 0 }, ...getGenres()];
-        this.setState({ movies: getMovies(), genres });
+    async componentDidMount() {
+        const { data } = await getGenres();
+        const genres = [{ name: "All Genres", _id: 0 }, ...data];
+        const { data: movies } = await getMovies();
+        this.setState({ movies: movies, genres });
     }
 
     handleSearch = ({ currentTarget: input }) => {
@@ -47,14 +52,21 @@ class Movies extends Component {
         this.setState({ movies });
     };
 
-    handleDelete = (movieId) => {
-        const updatedMovies = this.state.movies.filter((movie) => {
+    handleDelete = async (movieId) => {
+        const originalMovies = this.state.movies;
+
+        const movies = originalMovies.filter((movie) => {
             return movie._id !== movieId;
         });
-        this.setState({
-            movies: updatedMovies,
-        });
-        deleteMovie(movieId);
+        this.setState({ movies });
+        try {
+            await deleteMovie(movieId);
+        } catch (ex) {
+            if (ex.response && ex.response.status === 404) {
+                toast.error("Movies has already been deleted");
+                this.setState({ movies: originalMovies });
+            }
+        }
     };
 
     handlePageChange = (page) => {
